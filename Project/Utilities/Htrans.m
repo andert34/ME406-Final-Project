@@ -1,12 +1,7 @@
-function [ Htrans ] = Htrans( r1, r2, r3 )
-%HTRANS Homogenous translation along the vector r
-%   Gives a homogeneous translation matrix
-
-sym Htrans;
-r = [r1;r2;r3]; 
-
-z = [0;0;0];
-Htrans = [eye(3) r;...
-         z'      1];
-
+function H = Htrans(r1, r2, r3)
+% 	H = zeros(4);
+	H(1:3, 1:3) = eye(3);
+	H(1:3, 4) = [r1, r2, r3]';
+	H(4, 1:3) = [0 0 0];
+	H(4, 4) = 1;
 end
