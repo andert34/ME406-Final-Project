@@ -1,0 +1,8 @@
+function [ T ] = rotx(theta)
+% This function rotates a coordinate system by theta radians
+% around the x-axis
+    T = [1          0           0;
+         0          cos(theta) -sin(theta);
+         0          sin(theta)  cos(theta);];
+end
+
