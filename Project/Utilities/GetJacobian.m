@@ -13,7 +13,7 @@ function [J, Jdot] = GetJacobian(gamma, gammadot)
 
 [~, ~, IT, NT, Nr] = SawyerFK(gamma);
 
-for k = 1:length(IT)
+for k = 1:8
    IT{k} = IT{k}(1:3, 1:3);
 end
 
