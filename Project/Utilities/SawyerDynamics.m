@@ -1,4 +1,4 @@
-function [ bdot Hm Dm Gm Bm Cm ] = SawyerDynamics( b )
+function [ bdot Hm Dm Gm Bm Cm ] = SawyerDynamics( b, Va )
 %SawyerDynamics Solves for the current state rate (bdot) of the Sawyer
 %robot given the current state (b) and optionally returns Hm, Dm, Gm, Bm,
 %and Cm. 
@@ -27,7 +27,7 @@ gamma = b(1:7);
 gammadot = b(8:14);
 
 % Find recursively calculated Jacobians and Jacobian dots
-[J, Jdot] = getJacobian(gamma,gammadot);
+[J, Jdot] = GetJacobian(gamma,gammadot);
 
 %% Define System Parameters
 persistent BBJ
@@ -35,6 +35,8 @@ persistent BBGam
 persistent m
 persistent BBrcm
 
+% Gravity
+g = 9.79; % Gravity in Prescott, Arizona in m/s^2
 % Link Masses
 m = [8.19264294;    % Link 1
 	 5.50781768;    % Link 2
@@ -149,9 +151,9 @@ for h = 1:7
     Iw{h} = wr(1:3);    % Angular velocity of joint wrt inertial frame
      
     D = D + goober*Jdot{h}*gammadot + J{h}.'*[cross(Iw{h},BBJ{h}*Iw{h}); ...
-        IT{h}*cross(Iw{h},cross(Iw{h},BBGam{h}))];
+        IT{h}*cross(Iw{h},cross(Iw{h},BBGam{h})).'];
     
-    G = G + J{h}.'*[cross(BBrcm{h},IT{h}.'*[0;0;-m{h}*g]); [0;0;m{h}*g]];
+    G = G + J{h}.'*[cross(BBrcm{h},IT{h}.'*[0;0;-m(h)*g]); [0;0;m(h)*g]];
 end
 
 % Optional Outputs
@@ -161,6 +163,6 @@ Gm = Rm*G;        % Vector of gravitational forces
 
 bdot(1:7) = b(8:14);             % New joint velocities
 bdot(8:14) = Hm \ (Va - Dm - (Bm)*b(8:14) ...
-    - (Cm)*sign(bdot(1:7)) - Gm); % Joint accelerations
-
+    - (Cm)*sign(bdot(1:7).') - Gm); % Joint accelerations
+bdot = bdot.';
 end
